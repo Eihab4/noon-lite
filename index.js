@@ -9,6 +9,7 @@ import { globalError } from './src/middlewares/globalError.middleware.js'
 const app = express()
 const port = 3000
 app.use(express.json())
+app.use('/uploads', express.static('uploads'))
 bootstrap(app)
 
 app.use('*', (req, res, next) => {

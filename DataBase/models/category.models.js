@@ -27,4 +27,8 @@ export const categorySchema = new Schema({
     versionKey:false
 })
 
+categorySchema.post("init", function () {
+    this.image="http/localhost:3000/uploads/"+this.image
+})
+
 export const Category = model('Category', categorySchema)
