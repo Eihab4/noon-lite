@@ -28,7 +28,6 @@ export const addProduct = catchError(async (req, res, next) => {
     res.status(201).json({ message: 'Added product', product });
 });
 
-
 export const getAllProducts = catchError(async (req, res, next) => {
     const products = await Product.find()
     res.json({message:"all products retrieved successfully ",products})
