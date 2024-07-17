@@ -27,4 +27,10 @@ export const brandSchema = new Schema({
     versionKey:false
 })
 
+brandSchema.post("init", (docs) => {
+    if (docs.logo) {
+        docs.logo = `http://localhost:3000/uploads/brands/${docs.logo}`;
+    }
+})
+
 export const Brand = model('Brand', brandSchema)

@@ -63,4 +63,13 @@ const productSchema = new Schema({
     }
 })
 
+productSchema.post("init", function (doc) { 
+    if (doc.images) {
+        doc.images = doc.images.map(image => `http://localhost:3000/uploads/products/${image}`);
+    }
+    if (doc.imageCover) {
+        doc.imageCover = `http://localhost:3000/uploads/products/${doc.imageCover}`;
+    }
+})
+
 export const Product = model('Product', productSchema)

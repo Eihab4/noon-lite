@@ -1,6 +1,7 @@
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import { AppError } from "../utils/AppError.utils.js"; 
+import { AppError } from "../utils/AppError.utils.js";
+
 
 const fileUpload = (folderName) => {
     const storage = multer.diskStorage({
