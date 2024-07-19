@@ -28,10 +28,24 @@ export const addProduct = catchError(async (req, res, next) => {
     res.status(201).json({ message: 'Added product', product });
 });
 
-export const getAllProducts = catchError(async (req, res, next) => {
-    const products = await Product.find()
-    res.json({message:"all products retrieved successfully ",products})
-})
+export const getAllProducts = catchError(async (req, res) => {
+    // Initialize Mongoose query to find all products
+    let mongooseQuery = Product.find();
+    
+    // Initialize ApiFeature with mongooseQuery and the search query from the request
+    let apiFeature = new ApiFeature(mongooseQuery, req.query)
+        .filter()    // Apply filtering if needed
+        .sort()      // Apply sorting if needed
+        .paginate()  // Apply pagination if needed
+        .search();   // Apply search functionality if needed
+
+    // Execute the final query and retrieve products
+    const products = await apiFeature.MongooseQuery;
+    console.log('Retrieved Products:', products); // Debugging line
+
+    // Send the response with products
+    res.json({ message: "All products retrieved successfully", products });
+});
 
 export const getProductById = catchError(async (req, res, next) => { 
     const product = await Product.findById(req.params.id)

@@ -1,46 +1,91 @@
-import { Category } from "../../../DataBase/models/category.models.js"
-import slugify from'slugify'
-import { catchError } from "../../middlewares/catchError.middleware.js"
-import { AppError } from "../../utils/AppError.utils.js"
+import { Category } from "../../../DataBase/models/category.models.js";
+import slugify from 'slugify';
+import { catchError } from "../../middlewares/catchError.middleware.js";
+import { AppError } from "../../utils/AppError.utils.js";
 import fs from 'fs';
 import path from 'path';
+import ApiFeature from "../../utils/ApiFeature.utils.js";
 
-
+/**
+ * Add a new category to the database.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const addCategory = catchError(async (req, res, next) => {
-    req.body.slug = slugify(req.body.name)
-    if(req.file)req.body.image=req.file.filename
-    const category = new Category(req.body)
+    // Generate slug from the category name
+    req.body.slug = slugify(req.body.name);
+    
+    // Handle file upload if an image is provided
+    if (req.file) req.body.image = req.file.filename;
+    
+    // Create and save the new category
+    const category = new Category(req.body);
     await category.save();
-    res.status(201).json({message: "Added category",category})
-})
+    
+    // Respond with the newly created category
+    res.status(201).json({ message: "Added category", category });
+});
 
+/**
+ * Retrieve all categories from the database with optional query parameters.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const getAllCategories = catchError(async (req, res, next) => {
-    const categories = await Category.find()
-    res.json(categories)
-})
+    // Initialize Mongoose query to find all categories
+    let mongooseQuery = Category.find();
+    
+    // Apply ApiFeature to enhance query with filtering, sorting, pagination, and searching
+    let apiFeature = new ApiFeature(mongooseQuery, req.query).search();
+    
+    // Execute the final query and retrieve categories
+    const categories = await apiFeature.MongooseQuery;
+    console.log('Retrieved Categories:', categories); // Debugging line
+    
+    // Respond with the list of categories
+    res.json({ message: "All categories retrieved successfully", categories });
+});
 
-export const getCategoryById = catchError(async (req, res, next) => { 
-    const category = await Category.findById(req.params.id)
-    if (!category) return next(new AppError("Category not found",404))
-    res.json(category)
-})
+/**
+ * Retrieve a category by its ID.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
+export const getCategoryById = catchError(async (req, res, next) => {
+    // Find category by ID
+    const category = await Category.findById(req.params.id);
+    
+    // Handle case where category is not found
+    if (!category) return next(new AppError("Category not found", 404));
+    
+    // Respond with the found category
+    res.json(category);
+});
 
+/**
+ * Update an existing category by its ID.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const updateCategory = catchError(async (req, res, next) => {
+    // Generate new slug from the updated category name
     req.body.slug = slugify(req.body.name);
 
-    // Find the category by ID
+    // Find the existing category by ID
     const category = await Category.findById(req.params.id);
-    if (!category) {
-        return next(new AppError("Category not found", 404));
-    }
-
-    // Delete old image if there's a new one
+    if (!category) return next(new AppError("Category not found", 404));
+    
+    // If a new image is provided, handle old image deletion
     if (req.file && req.file.filename) {
         const imageUrl = category.image;
         const parts = imageUrl.split('/');
         const fileName = parts[parts.length - 1]; // Extract filename from imageUrl
 
-        // Construct full path to the old image
+        // Construct path to the old image
         const moduleURL = new URL(import.meta.url);
         const __dirname = path.dirname(moduleURL.pathname);
         const oldImagePath = path.join(__dirname, '../../../uploads/categories', fileName);
@@ -49,23 +94,29 @@ export const updateCategory = catchError(async (req, res, next) => {
         if (fs.existsSync(oldImagePath)) {
             fs.unlinkSync(oldImagePath);
         } else {
-            next(new AppError('Old image not found',404))
+            return next(new AppError('Old image not found', 404));
         }
-        req.body.image = req.file.filename; // Update req.body.image with the new filename
+        
+        // Update req.body.image with the new filename
+        req.body.image = req.file.filename;
     }
 
-    // Update the category
+    // Update the category with new data
     const updatedCategory = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedCategory) {
-        return next(new AppError("Category not found after update", 404));
-    }
+    if (!updatedCategory) return next(new AppError("Category not found after update", 404));
 
     // Respond with the updated category
-    res.json({message:"category updated successfully",updatedCategory});
+    res.json({ message: "Category updated successfully", updatedCategory });
 });
 
-
+/**
+ * Delete a category by its ID.
+ * @param {Request} req - Express request object.
+ * @param {Response} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ */
 export const deleteCategory = catchError(async (req, res, next) => {
+    // Find and delete the category by ID
     const category = await Category.findByIdAndDelete(req.params.id);
     if (!category) return next(new AppError("Category not found", 404));
 
@@ -75,20 +126,18 @@ export const deleteCategory = catchError(async (req, res, next) => {
         const parts = imageUrl.split('/');
         const fileName = parts[parts.length - 1]; // Extract filename from imageUrl
 
-        // Construct full path to the image
+        // Construct path to the image
         const moduleURL = new URL(import.meta.url);
         const __dirname = path.dirname(moduleURL.pathname);
         const imagePath = path.join(__dirname, '../../../uploads/categories', fileName);
 
         // Delete the image and handle any errors
         fs.unlink(imagePath, (err) => {
-            if (err) {
-                return next(new AppError('Error deleting image', 500));
-            } else {
-                console.log('Image deleted successfully!');
-            }
+            if (err) return next(new AppError('Error deleting image', 500));
+            console.log('Image deleted successfully!');
         });
     }
 
-    res.status(200).json({ message: "Deleted category" });
+    // Respond with a success message
+    res.status(200).json({ message: "Category deleted successfully" });
 });

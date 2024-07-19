@@ -3,7 +3,7 @@ import { addSubCategory, deleteSubCategory, getAllSubCategories, getSubCategoryB
 
 
 
-export const subCategoryRouter = Router()
+export const subCategoryRouter = Router({ mergeParams: true });
 
 
 subCategoryRouter.post('/', addSubCategory)
