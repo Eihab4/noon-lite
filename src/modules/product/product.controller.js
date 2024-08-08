@@ -2,6 +2,7 @@ import slugify from "slugify";
 import { Product } from "../../../DataBase/models/product.model.js";
 import { catchError } from "../../middlewares/catchError.middleware.js";
 import { AppError } from "../../utils/AppError.utils.js";
+import ApiFeature from "../../utils/ApiFeature.utils.js";
 
 export const addProduct = catchError(async (req, res, next) => {
     // Check if req.files and req.files.imageCover are properly handled by multer

@@ -23,5 +23,8 @@ const reviewSchema = new Schema({
     }
     
 })
-
+reviewSchema.pre(/^find/, function (next) {
+    this.populate('user').populate('product');
+    next();
+});
 export const Review = model('Review', reviewSchema)

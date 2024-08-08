@@ -1,6 +1,9 @@
-import { connect } from 'mongoose'
+import mongoose from 'mongoose'; // Ensure 'mongoose' is imported
+import dotenv from 'dotenv';
 
-export const dbConnection = connect("mongodb://localhost:27017/E-commerce", {
-})
-.then(() => console.log("Connected to MongoDB"))
-    .catch((error) => console.error("Error connecting to MongoDB:", error))
+dotenv.config(); 
+
+const dbUri = process.env.DATABASE_URL;
+export const dbConnection=mongoose.connect(dbUri)
+    .then(() => console.log('Database connected successfully'))
+    .catch(err => console.error('Database connection error:', err));

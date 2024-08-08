@@ -26,9 +26,13 @@ export const categorySchema = new Schema({
     versionKey: false
 })
 
-categorySchema.post("init", function (doc) {
-    if (doc.image) {
-        doc.image = `http://localhost:3000/uploads/categories/${doc.image}`;
+categorySchema.post('init', function (doc) {
+    try {
+        if (doc.image) {
+            doc.image = process.env.BASE_URL + `categories/${doc.image}`;
+        }
+    } catch (error) {
+        console.error('Error processing category document:', error);
     }
 });
 export const Category = model('Category', categorySchema);

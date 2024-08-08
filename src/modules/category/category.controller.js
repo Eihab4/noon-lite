@@ -35,7 +35,7 @@ export const addCategory = catchError(async (req, res, next) => {
  */
 export const getAllCategories = catchError(async (req, res, next) => {
     // Initialize Mongoose query to find all categories
-    let mongooseQuery = Category.find();
+    let mongooseQuery = await Category.find();
     
     // Apply ApiFeature to enhance query with filtering, sorting, pagination, and searching
     let apiFeature = new ApiFeature(mongooseQuery, req.query).search();
@@ -56,7 +56,7 @@ export const getAllCategories = catchError(async (req, res, next) => {
  */
 export const getCategoryById = catchError(async (req, res, next) => {
     // Find category by ID
-    const category = await Category.findById(req.params.id);
+    const category = await Category.findById(req.params.category);
     
     // Handle case where category is not found
     if (!category) return next(new AppError("Category not found", 404));

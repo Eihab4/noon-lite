@@ -27,10 +27,15 @@ export const brandSchema = new Schema({
     versionKey:false
 })
 
-brandSchema.post("init", (docs) => {
-    if (docs.logo) {
-        docs.logo = `http://localhost:3000/uploads/brands/${docs.logo}`;
+brandSchema.post('init', (doc) => {
+    try {
+        if (doc.logo) {
+            console.log(process.env.BASE_URL)
+            doc.logo = process.env.BASE_URL + `brands/${doc.logo}`;
+        }
+    } catch (error) {
+        console.error('Error processing brand document:', error);
     }
-})
+});
 
 export const Brand = model('Brand', brandSchema)
