@@ -50,33 +50,3 @@ export const updateOrderStatus = catchError(async (req, res, next) => {
     res.status(200).json({ message: "Order status updated successfully", order })
 })
 
-export const createCheckoutSession = catchError(async (req, res, next) => {
-    let cart = await Cart.findOne({
-        user: req.user._id
-    })
-    if (!cart) return next(new AppError("User's cart not found", 404))
-    
-    let totalPrice = cart.priceAfterDiscount || cart.totalPrice
-    let session = await stripe.checkout.sessions.create({
-        line_items: [
-            {
-                price_data: {
-                    currency: 'egp',
-                    product_data: {
-                        name: req.user.name
-                    },
-                    unit_amount: totalPrice*100,
-                },
-                quantity: 1,
-            },
-        ],
-        mode: 'payment',
-        success_url: `https://www.facebook.com/`,
-        cancel_url: `https://www.youtube.com/`,
-        customer_email: req.user.email,
-        metadata:req.body.shippingAddress,
-        client_reference_id:cart._id,
-        payment_method_types: ['card'],
-    })
-    res.status(200).json({ message: "Checkout session created successfully", session })
-})
