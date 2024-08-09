@@ -3,7 +3,6 @@ import { Order } from "../../../DataBase/models/order.model.js";
 import { catchError } from "../../middlewares/catchError.middleware.js";
 import { AppError } from "../../utils/AppError.utils.js";
 import Stripe from 'stripe';
-const stripe = new Stripe('sk_test_51Pk7OoJzar188oGH99ftfMfDoHoybYsXMMRDKBLGm6jmxaXM4KJnzMRulrFrvDmTIQzaYa21N0IYmRBVKWqnMklC00Uq4nOE2R');
 
 
 export const createCashOrder = catchError(async (req, res, next) => {
