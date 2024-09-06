@@ -10,11 +10,17 @@ import { addProductValidation, deleteProductValidation, getProductByIdValidation
 
 export const productRouter=Router()
 
+productRouter.get('/', getAllProducts)
+productRouter.get('/:id', validate(getProductByIdValidation), getProductById)
+
+// Only admin can access these routes
 productRouter.use(protectedRoutes, allowedTo('admin'));
 
-
-productRouter.post('/',uploadMultipleFiles([{name:'imageCover',maxCount:1},{name:'images',maxCount:10}]),validate(addProductValidation),addProduct)
-productRouter.get('/', getAllProducts)
-productRouter.get('/:id', validate(getProductByIdValidation),getProductById)
+productRouter.post(
+    '/',
+    uploadMultipleFiles([{ name: 'imageCover', maxCount: 1 }, { name: 'images', maxCount: 10 }], 'products'), // Ensure 'products' is the folder name
+    validate(addProductValidation),
+    addProduct
+);
 productRouter.put('/:id',uploadMultipleFiles([{name:'imageCover',maxCount:1},{name:'images',maxCount:10}]),validate(updateProductValidation),updateProduct)
 productRouter.delete('/:id',validate(deleteProductValidation),deleteProduct)

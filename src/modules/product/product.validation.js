@@ -2,58 +2,75 @@ import Joi from 'joi'
 
 
 export const addProductValidation = Joi.object({
-    name: Joi.string().required(), // Product name must be a string and is required
-    imageCover: Joi.object({
-        filename: Joi.string().required(),
-        mimetype: Joi.string().required(),
-        path: Joi.string().required(),
-        size: Joi.number().positive().max(5242880).required(),
-        encoding: Joi.string().required(),
-        originalname: Joi.string().required(),
-        destination: Joi.string().required(),
-    }), // Main product image filename must be a string and is required
-    images: Joi.array().items(Joi.object({
-        filename: Joi.string().required(),
-        mimetype: Joi.string().required(),
-        path: Joi.string().required(),
-        size: Joi.number().positive().max(5242880).required(),
-        encoding: Joi.string().required(),
-        originalname: Joi.string().required(),
-        destination: Joi.string().required(),
-    })).optional(), // Additional images filenames as an optional array of strings
+    title: Joi.string().required(), // Product name must be a string and is required
+    price: Joi.number().positive().required(), // Product price must be a positive number and is required
+    quantity: Joi.number().positive().required(), // Product quantity must be a positive number and is required
+    brand: Joi.string().hex().length(24).required(), // Brand ID must be a valid hex string and is required
+    category: Joi.string().hex().length(24).required(), // Category ID must be a valid hex string and is required
+    subCategory: Joi.string().hex().length(24).required(), // Subcategory ID must be a valid hex string and is required
+    rateAverage: Joi.number().min(0).max(5).optional(), // Product rating average must be a number between 0 and 5
+    rateCount: Joi.number().integer().optional(), // Product rating count must be an integer
     slug: Joi.string().optional(), // Slug is optional and should be a string
-    // Add other product fields here if needed
+    createdBy: Joi.string().hex().length(24).required(),
+    description: Joi.string().min(10).required(),
+    imageCover:  Joi.object({
+        fieldname: Joi.string().required(),
+        mimetype: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().positive().max(5242880).required(),
+        encoding: Joi.string().required(),
+        originalname: Joi.string().required(),
+        destination: Joi.string().required(),
+        filename: Joi.string()
+    .pattern(/\.(png|jpg|jpeg|gif)$/)  // Allows .png, .jpg, .jpeg, and .gif extensions
+    .required()
+    }).required(), // Main product image filename must be a string and is required
+    images: Joi.array().items( Joi.object({
+        fieldname: Joi.string().required(),
+        mimetype: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().positive().max(5242880).required(),
+        encoding: Joi.string().required(),
+        originalname: Joi.string().required(),
+        destination: Joi.string().required(),
+        filename: Joi.string()
+    .pattern(/\.(png|jpg|jpeg|gif)$/)  // Allows .png, .jpg, .jpeg, and .gif extensions
+    .required()
+    })).optional(), // Additional images filenames as an optional array of strings
 });
+
+
 export const updateProductValidation = Joi.object({
-    id: Joi.string().hex().length(24).required(), // Product ID must be a valid hex string and is required
-
-    name: Joi.string()
-        .min(3) // Minimum length of 3 characters for the product name
-        .optional(), // Product name is optional for updates
-
-    imageCover: Joi.object({
-        filename: Joi.string().optional(), // Filename must be a string, optional
-        mimetype: Joi.string().optional(), // MIME type of the file, optional
-        path: Joi.string().optional(), // Path where the file is stored, optional
-        size: Joi.number().positive().max(5242880).optional(), // File size must be a positive number and should not exceed 5MB (5242880 bytes), optional
-        encoding: Joi.string().optional(), // Encoding of the file, optional
-        originalname: Joi.string().optional(), // Original name of the file, optional
-        destination: Joi.string().optional(), // Destination directory of the file, optional
-    }).optional(), // `imageCover` is optional
-
-    images: Joi.array().items(Joi.object({
-        filename: Joi.string().optional(), // Filename must be a string, optional
-        mimetype: Joi.string().optional(), // MIME type of the file, optional
-        path: Joi.string().optional(), // Path where the file is stored, optional
-        size: Joi.number().positive().max(5242880).optional(), // File size must be a positive number and should not exceed 5MB (5242880 bytes), optional
-        encoding: Joi.string().optional(), // Encoding of the file, optional
-        originalname: Joi.string().optional(), // Original name of the file, optional
-        destination: Joi.string().optional(), // Destination directory of the file, optional
-    })).optional(), // `images` is optional
-
-    // You can add other fields as needed here
+    title: Joi.string(), // Product name must be a string and is   price: Joi.number().positive(), // Product price must be a positive number and is   priceAfterDiscount: Joi.number().positive().optional(), // Discounted product price must be a positive number and is   quantity: Joi.number().positive(), // Product quantity must be a positive number and is   brand: Joi.string().hex().length(24), // Brand ID must be a valid hex string and is   category: Joi.string().hex().length(24), // Category ID must be a valid hex string and is   subCategory: Joi.string().hex().length(24), // Subcategory ID must be a valid hex string and is   rateAverage: Joi.number().min(0).max(5).optional(), // Product rating average must be a number between 0 and 5
+    rateCount: Joi.number().integer().optional(), // Product rating count must be an integer
+    slug: Joi.string().optional(), // Slug is optional and should be a string
+    createdBy: Joi.string().hex().length(24),
+    description: Joi.string().min(10),
+    imageCover:  Joi.object({
+        fieldname: Joi.string().required(),
+        mimetype: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().positive().max(5242880).required(),
+        encoding: Joi.string().required(),
+        originalname: Joi.string().required(),
+        destination: Joi.string().required(),
+        filename: Joi.string()
+    .pattern(/\.(png|jpg|jpeg|gif)$/)  // Allows .png, .jpg, .jpeg, and .gif extensions
+    .required()
+    }), // Main product image filename must be a string and is required
+    images: Joi.array().items( Joi.object({
+        fieldname: Joi.string().required(),
+        mimetype: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().positive().max(5242880).required(),
+        encoding: Joi.string().required(),
+        originalname: Joi.string().required(),
+        destination: Joi.string().required(),
+        filename: Joi.string()
+    .pattern(/\.(png|jpg|jpeg|gif)$/)  // Allows .png, .jpg, .jpeg, and .gif extensions
+    .required()
+    })).optional(), // Additional images filenames as an optional array of strings
 });
-
 export const deleteProductValidation = Joi.object({
     id: Joi.string().hex().length(24).required(), // Product ID must be a valid hex string and is required
 })

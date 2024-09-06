@@ -25,7 +25,6 @@ const productSchema = new Schema({
     },
     priceAfterDiscount: {
         type: Number,
-        required: true,
         min:0
     },
     quantity: {
@@ -77,6 +76,7 @@ productSchema.post("init", function (doc) {
         doc.images = doc.images.map(image => process.env.BASE_URL+`products/${image}`);
     }
     if (doc.imageCover) {
+        console.log(process.env.BASE_URL)
         doc.imageCover = process.env.BASE_URL+`products/${doc.imageCover}`;
     }
 })

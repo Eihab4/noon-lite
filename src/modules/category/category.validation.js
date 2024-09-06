@@ -5,13 +5,16 @@ import Joi from "joi"
 export const addCategoryValidation = Joi.object({
     name: Joi.string().min(3).required(),
     image: Joi.object({
-        filename: Joi.string().required(),
+        fieldname: Joi.string().required(),
         mimetype: Joi.string().required(),
         path: Joi.string().required(),
         size: Joi.number().positive().max(5242880).required(),
         encoding: Joi.string().required(),
         originalname: Joi.string().required(),
         destination: Joi.string().required(),
+        filename: Joi.string()
+    .pattern(/\.(png|jpg|jpeg|gif)$/)  // Allows .png, .jpg, .jpeg, and .gif extensions
+    .required()
     }).required(),
     createdBy:Joi.string().hex().length(24).required()
 });

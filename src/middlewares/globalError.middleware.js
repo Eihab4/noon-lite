@@ -5,7 +5,7 @@ export const globalError = (err, req, res, next) => {
     if (statusCode < 100 || statusCode > 599) {
         statusCode = 500; // Ensure statusCode is within valid range if it's not set correctly
     }
-
+    console.log(err)
     res.status(statusCode).json({
         message: err.message || 'Internal Server Error',
         stack: err.stack // Optionally include stack trace for debugging (not recommended for production)

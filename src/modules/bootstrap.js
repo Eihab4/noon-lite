@@ -14,7 +14,7 @@ import { wishlistRouter } from "./wishlist/wishlist.routes.js"
 
 export const bootstrap = app => {
     app.use('/api/categories', categoryRouter)
-    app.use('/api/subcategories', subCategoryRouter) 
+    app.use('/api/sub-categories', subCategoryRouter) 
     app.use('/api/products', productRouter)
     app.use('/api/brands', brandRouter)
     app.use('/api/auth', authRouter)
@@ -22,6 +22,6 @@ export const bootstrap = app => {
     app.use('/api/reviews', reviewRouter)
     app.use('/api/wishlists', wishlistRouter)
     app.use('/api/address', addressRouter)
-    app.use('/api/coupon', couponRouter)
-    app.use('api/cart', cartRouter)
+    app.use('/api/coupons', couponRouter)
+    app.use('api/carts', cartRouter)
 }

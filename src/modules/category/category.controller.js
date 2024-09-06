@@ -42,7 +42,6 @@ export const getAllCategories = catchError(async (req, res, next) => {
     
     // Execute the final query and retrieve categories
     const categories = await apiFeature.MongooseQuery;
-    console.log('Retrieved Categories:', categories); // Debugging line
     
     // Respond with the list of categories
     res.json({ message: "All categories retrieved successfully", categories });
@@ -116,27 +115,31 @@ export const updateCategory = catchError(async (req, res, next) => {
  * @param {Function} next - Express next middleware function.
  */
 export const deleteCategory = catchError(async (req, res, next) => {
-    // Find and delete the category by ID
-    const category = await Category.findByIdAndDelete(req.params.id);
-    if (!category) return next(new AppError("Category not found", 404));
+    // Find the category by ID
+    const category = await Category.findById(req.params.id);
+    if (!category) return next(new AppError("Category not found", 404));  // If category doesn't exist
 
-    // If the category has an image, delete it from the filesystem
+    // If the category has an image, delete the image file from the filesystem
     if (category.image) {
-        const imageUrl = category.image;
-        const parts = imageUrl.split('/');
-        const fileName = parts[parts.length - 1]; // Extract filename from imageUrl
+        const imageUrl = category.image;  // Get the image URL
+        const parts = imageUrl.split('/');  // Split the URL to extract the filename
+        const fileName = parts[parts.length - 1];  // Get the filename
 
-        // Construct path to the image
+        // Construct the full path to the image
         const moduleURL = new URL(import.meta.url);
         const __dirname = path.dirname(moduleURL.pathname);
         const imagePath = path.join(__dirname, '../../../uploads/categories', fileName);
 
-        // Delete the image and handle any errors
+        // Delete the image file and handle any errors
         fs.unlink(imagePath, (err) => {
-            if (err) return next(new AppError('Error deleting image', 500));
-            console.log('Image deleted successfully!');
+            if (err) {
+                return next(new AppError('Error deleting image', 500));  // Error handling during file deletion
+            }
         });
     }
+
+    // Now delete the category from the database
+    await Category.findByIdAndDelete(req.params.id);
 
     // Respond with a success message
     res.status(200).json({ message: "Category deleted successfully" });

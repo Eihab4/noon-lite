@@ -3,179 +3,188 @@ import { Product } from "../../../DataBase/models/product.model.js";
 import { catchError } from "../../middlewares/catchError.middleware.js";
 import { AppError } from "../../utils/AppError.utils.js";
 import ApiFeature from "../../utils/ApiFeature.utils.js";
+import path from 'path';
+import fs from 'fs';
 
+/**
+ * Add a new product to the database.
+ * Handles image uploads (cover image and array of images) via multer and assigns filenames.
+ */
 export const addProduct = catchError(async (req, res, next) => {
-    // Check if req.files and req.files.imageCover are properly handled by multer
+    // Ensure that imageCover and images are uploaded via multer.
     if (!req.files || !req.files.imageCover || req.files.images.length === 0) {
         return next(new AppError('Please upload at least one image for imageCover and images', 400));
     }
 
-    // Assign filename to imageCover
+    // Assign the uploaded cover image filename to imageCover field.
     req.body.imageCover = req.files.imageCover[0].filename;
 
-    // Assign array of filenames to images
+    // Assign the array of uploaded image filenames to the images field.
     req.body.images = req.files.images.map((file) => file.filename);
 
-    // Generate slug from product name
-    req.body.slug = slugify(req.body.name);
+    // Generate a slug based on the product's title.
+    req.body.slug = slugify(req.body.title);
 
-    // Create a new Product instance using req.body
+    // Create a new Product instance and save it to the database.
     const product = new Product(req.body);
-
-    // Save the product to the database
     await product.save();
 
-    // Respond with a success message and the created product
+    // Send a success response with the newly created product.
     res.status(201).json({ message: 'Added product', product });
 });
 
+/**
+ * Retrieve all products from the database, applying filters, sorting, pagination, and search as needed.
+ */
 export const getAllProducts = catchError(async (req, res) => {
-    // Initialize Mongoose query to find all products
+    // Initialize the query to retrieve all products.
     let mongooseQuery = Product.find();
     
-    // Initialize ApiFeature with mongooseQuery and the search query from the request
+    // Apply filtering, sorting, pagination, and search using ApiFeature.
     let apiFeature = new ApiFeature(mongooseQuery, req.query)
-        .filter()    // Apply filtering if needed
-        .sort()      // Apply sorting if needed
-        .paginate()  // Apply pagination if needed
-        .search();   // Apply search functionality if needed
+        .filter()
+        .sort()
+        .paginate()
+        .search();
 
-    // Execute the final query and retrieve products
+    // Execute the query to retrieve products.
     const products = await apiFeature.MongooseQuery;
-    console.log('Retrieved Products:', products); // Debugging line
 
-    // Send the response with products
+    // Send a success response with the retrieved products.
     res.json({ message: "All products retrieved successfully", products });
 });
 
+/**
+ * Retrieve a single product by its ID.
+ */
 export const getProductById = catchError(async (req, res, next) => { 
-    const product = await Product.findById(req.params.id)
-    if (!product) return next(new AppError("Product not found",404))
-    res.json(product)
-})
+    const product = await Product.findById(req.params.id);
+    if (!product) return next(new AppError("Product not found", 404));
 
+    // Send a success response with the retrieved product.
+    res.json(product);
+});
+
+/**
+ * Update an existing product by its ID, including updating images (cover and array of images).
+ */
 export const updateProduct = catchError(async (req, res, next) => {
-    // Generate new slug if product name is updated
+    // Generate a new slug if the product name is updated.
     if (req.body.name) {
         req.body.slug = slugify(req.body.name);
     }
 
-    // Find the product by ID
+    // Find the existing product in the database by ID.
     const product = await Product.findById(req.params.id);
     if (!product) {
         return next(new AppError('Product not found', 404));
     }
 
-    // Update image cover if a new file is uploaded
+    // If a new image cover is uploaded, remove the old image cover from the filesystem.
     if (req.files.imageCover && req.files.imageCover.length > 0) {
         const imageCoverUrl = product.imageCover;
         if (imageCoverUrl) {
             const parts = imageCoverUrl.split('/');
-            const fileName = parts[parts.length - 1]; // Extract filename from imageCoverUrl
+            const fileName = parts[parts.length - 1];
 
-            // Construct full path to the old image cover
+            // Construct full path to the old image cover.
             const moduleURL = new URL(import.meta.url);
             const __dirname = path.dirname(moduleURL.pathname);
             const oldImageCoverPath = path.join(__dirname, '../../../uploads/products', fileName);
 
-            // Delete the old image cover if it exists
+            // Delete the old image cover from the filesystem.
             if (fs.existsSync(oldImageCoverPath)) {
                 fs.unlinkSync(oldImageCoverPath);
-                console.log('Old image cover deleted successfully!');
-            } else {
-                console.log('Old image cover not found:', oldImageCoverPath);
             }
         }
 
+        // Assign the new image cover filename.
         req.body.imageCover = req.files.imageCover[0].filename;
     }
 
-    // Update images array if new files are uploaded or existing ones are replaced
+    // If new images are uploaded, remove old images that are no longer used.
     if (req.files.images && req.files.images.length > 0) {
-        // Filter out old images that are no longer used
         const imagesUrls = product.images;
         const newImages = req.files.images.map((file) => file.filename);
 
+        // Identify old images to be deleted.
         const oldImagesToDelete = imagesUrls.filter((url) => !newImages.includes(url));
 
-        // Delete old images that are no longer used
+        // Delete each old image from the filesystem.
         oldImagesToDelete.forEach((url) => {
             const parts = url.split('/');
-            const fileName = parts[parts.length - 1]; // Extract filename from url
+            const fileName = parts[parts.length - 1];
 
-            // Construct full path to the old image
+            // Construct full path to the old image.
             const moduleURL = new URL(import.meta.url);
             const __dirname = path.dirname(moduleURL.pathname);
             const oldImagePath = path.join(__dirname, '../../../uploads/products', fileName);
 
-            // Delete the old image if it exists
             if (fs.existsSync(oldImagePath)) {
                 fs.unlinkSync(oldImagePath);
-                console.log(`Old image ${fileName} deleted successfully!`);
-            } else {
-                console.log(`Old image ${fileName} not found:`, oldImagePath);
             }
         });
 
-        // Update req.body.images with the filenames of all uploaded images
+        // Assign the new image filenames.
         req.body.images = newImages;
     }
 
-    // Update the product in the database
+    // Update the product in the database.
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-    // Respond with the updated product
+    // Send a success response with the updated product.
     res.json({ message: 'Product updated successfully', product: updatedProduct });
 });
 
+/**
+ * Delete a product by its ID, including removing associated images (cover and array of images) from the filesystem.
+ */
 export const deleteProduct = catchError(async (req, res, next) => {
-    // Find the product by ID and delete it
-    const product = await Product.findByIdAndDelete(req.params.id);
+    // Find the product in the database by ID.
+    const product = await Product.findById(req.params.id);
     if (!product) {
         return next(new AppError('Product not found', 404));
     }
 
-    // Delete image cover if it exists
+    // Helper function to delete files from the filesystem.
+    const deleteFile = (filePath) => {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    };
+
+    // Delete the image cover from the filesystem if it exists.
     if (product.imageCover) {
         const imageCoverUrl = product.imageCover;
         const parts = imageCoverUrl.split('/');
-        const fileName = parts[parts.length - 1]; // Extract filename from imageCoverUrl
+        const fileName = parts[parts.length - 1];
 
-        // Construct full path to the image cover
+        // Construct full path to the image cover.
         const moduleURL = new URL(import.meta.url);
         const __dirname = path.dirname(moduleURL.pathname);
         const imagePath = path.join(__dirname, '../../../uploads/products', fileName);
 
-        // Delete the image cover file
-        if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
-            console.log(`Deleted image cover ${fileName} successfully!`);
-        } else {
-            console.log(`Image cover ${fileName} not found:`, imagePath);
-        }
+        deleteFile(imagePath);
     }
 
-    // Delete images array if they exist
+    // Delete each image in the images array from the filesystem.
     if (product.images && product.images.length > 0) {
         product.images.forEach((imageUrl) => {
             const parts = imageUrl.split('/');
-            const fileName = parts[parts.length - 1]; // Extract filename from imageUrl
+            const fileName = parts[parts.length - 1];
 
-            // Construct full path to each image
+            // Construct full path to the image.
             const moduleURL = new URL(import.meta.url);
             const __dirname = path.dirname(moduleURL.pathname);
             const imagePath = path.join(__dirname, '../../../uploads/products', fileName);
 
-            // Delete the image file
-            if (fs.existsSync(imagePath)) {
-                fs.unlinkSync(imagePath);
-                console.log(`Deleted image ${fileName} successfully!`);
-            } else {
-                console.log(`Image ${fileName} not found:`, imagePath);
-            }
+            deleteFile(imagePath);
         });
     }
 
-    // Respond with success message
+    // Delete the product from the database.
+    await Product.findByIdAndDelete(req.params.id);
+
+    // Send a success response.
     res.status(200).json({ message: 'Deleted product and associated images' });
 });

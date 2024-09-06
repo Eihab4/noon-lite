@@ -2,23 +2,41 @@ import { AppError } from "../utils/AppError.utils.js";
 
 export const validate = (schema) => {
     return (req, res, next) => {
-        let filter = {}
+        let filter = {};
+        console.log(req.files)
+        // For single file upload
         if (req.file) {
-            filter = { image:req.file,...req.body, ...req.params}
+            filter = { 
+                imageCover: req.file, 
+                ...req.body, 
+                ...req.params 
+            };
         }
+        // For multiple files upload
         else if (req.files) {
-            filter={imageCover:req.files.imageCover,images:req.files.images, ...req.params,...req.body}
+            filter = { 
+                imageCover: req.files.imageCover ? req.files.imageCover[0] : undefined,
+                images: req.files.images ? req.files.images : [],
+                ...req.body, 
+                ...req.params 
+            };
         }
+        // No file upload
         else {
-            filter = {...req.params,...req.body}
+            filter = { 
+                ...req.body, 
+                ...req.params 
+            };
         }
-        const { error } = schema.validate(filter, { abortEarly: false });
 
+        // Validate the data against the schema
+        const { error } = schema.validate(filter, { abortEarly: false });
+        console.log(error)
         if (!error) {
             next(); // Proceed to the next middleware
         } else {
             const errorMessagesArray = error.details.map(err => err.message);
-            next(new AppError(errorMessagesArray, 401));
+            next(new AppError(errorMessagesArray.join(', '), 400)); // Send error as a single message
         }
     };
 };
