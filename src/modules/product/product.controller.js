@@ -9,7 +9,9 @@ import fs from 'fs';
 /**
  * Add a new product to the database.
  * Handles image uploads (cover image and array of images) via multer and assigns filenames.
+ * @return product
  */
+
 export const addProduct = catchError(async (req, res, next) => {
     // Ensure that imageCover and images are uploaded via multer.
     if (!req.files || !req.files.imageCover || req.files.images.length === 0) {
