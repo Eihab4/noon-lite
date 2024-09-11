@@ -34,7 +34,7 @@ Welcome to the E-Commerce Application! This project is designed to provide a sea
 
 ## Database ERD
 
-![ERD Diagram](Screenshot 2024-09-12 at 2.41.30 AM)
+![ERD Diagram](Screenshot 2024-09-12 at 2.41.30 AM.png)
 
 ## Getting Started
 
@@ -96,5 +96,5 @@ We welcome contributions to enhance the E-Commerce Application! Please follow th
 ---
 
 Thank you for checking out the E-Commerce Application! We hope you find it useful and informative. If you have any questions or feedback, feel free to reach out!
-```
+
 
