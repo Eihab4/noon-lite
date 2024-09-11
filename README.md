@@ -34,7 +34,7 @@ Welcome to the E-Commerce Application! This project is designed to provide a sea
 
 ## Database ERD
 
-![ERD Diagram](Screenshot 2024-09-12 at 2.41.30 AM.png)
+![ERD Diagram]([Screenshot 2024-09-12 at 2.41.30 AM.png](https://github.com/Eihab4/E-commerce-App/blob/main/Screenshot%202024-09-12%20at%202.41.30%20AM.png))
 
 ## Getting Started
 
