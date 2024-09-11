@@ -8,7 +8,7 @@ import { addReviewValidation, deleteReviewValidation, getReviewByIdValidation, u
 export const reviewRouter = Router()
 
 reviewRouter.post('/', protectedRoutes, allowedTo('user'), validate(addReviewValidation),addReview)
-reviewRouter.get('/', getAllReviews)
+reviewRouter.get('/product/:id', getAllReviews)
 reviewRouter.get('/:id', validate(getReviewByIdValidation),getReviewById)
 reviewRouter.put('/:id', protectedRoutes, allowedTo('user'), validate(updateReviewValidation),updateReview)
 reviewRouter.delete('/:id', protectedRoutes, allowedTo('user', 'admin'), validate(deleteReviewValidation),deleteReview)

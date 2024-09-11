@@ -4,6 +4,10 @@
 ## user can change his password and it will be reflected hashed in the db
 ## when you remove a category or brand or brand the photos related to it directly deleted .
 ## there is always a field that states who did what and you can't make any change unless you write you id to avoid issues as much as possible
+## any user can add a review and update it or delete it 
+## there is the option of coupon you can use it and the price will be decreased based on it
+## 
+
 
 
 

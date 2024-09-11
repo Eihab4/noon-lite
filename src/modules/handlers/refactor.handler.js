@@ -1,3 +1,4 @@
+import { AppError } from '../../utils/AppError.utils.js';
 import {catchError} from './../../middlewares/catchError.middleware.js'
 // refactoring the delete end point to avoid DRY
 export const deleteOne = (model) => {

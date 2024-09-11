@@ -2,7 +2,7 @@ import { Review } from "../../../DataBase/models/review.model.js";
 import { catchError } from "../../middlewares/catchError.middleware.js";
 import ApiFeature from "../../utils/ApiFeature.utils.js";
 import { AppError } from "../../utils/AppError.utils.js";
-import { deleteOne, getOneById } from "../handlers/refactor.handler.js";
+import {  getOneById } from "../handlers/refactor.handler.js";
 
 export const addReview = catchError(async (req, res, next) => {
     req.body.user = req.user._id;
@@ -14,7 +14,7 @@ export const addReview = catchError(async (req, res, next) => {
 })
 
 export const getAllReviews = catchError(async (req, res, next) => {
-    const mongooseQuery = Review.find();
+    const mongooseQuery = Review.find({product:req.params.id});
     let apiFeature = new ApiFeature(mongooseQuery, req.query).filter().paginate();
     const reviews = await apiFeature.MongooseQuery;
     res.status(200).json({ message: "Reviews retrieved successfully", reviews });

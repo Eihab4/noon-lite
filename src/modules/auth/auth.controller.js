@@ -14,8 +14,6 @@ export const signUp = catchError(async (req, res, next) => {
 
 export const signIn = catchError(async (req, res, next) => {
     let user = await User.findOne({ email: req.body.email })
-    console.log(req.body.password)
-    console.log(user.password)
 if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
         return next(new AppError('Invalid Email or Password', 409));
     }    let token = jwt.sign({ userId: user._id, role: user.role }, process.env.SECRET_KEY)

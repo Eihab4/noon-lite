@@ -1,5 +1,6 @@
 import { Coupon } from "../../../DataBase/models/coupon.model.js";
 import { catchError } from "../../middlewares/catchError.middleware.js";
+import { AppError } from "../../utils/AppError.utils.js";
 import { deleteOne, getOneById } from "../handlers/refactor.handler.js";
 
 export const addCoupon = catchError(async (req, res, next) => {

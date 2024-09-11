@@ -12,17 +12,22 @@ import fs from 'fs';
  * @return product
  */
 
+
 export const addProduct = catchError(async (req, res, next) => {
-    // Ensure that imageCover and images are uploaded via multer.
-    if (!req.files || !req.files.imageCover || req.files.images.length === 0) {
-        return next(new AppError('Please upload at least one image for imageCover and images', 400));
+    // Ensure that imageCover is uploaded via multer.
+    if (!req.files || !req.files.imageCover || req.files.imageCover.length === 0) {
+        return next(new AppError('Please upload an image for imageCover', 400));
     }
 
     // Assign the uploaded cover image filename to imageCover field.
     req.body.imageCover = req.files.imageCover[0].filename;
 
-    // Assign the array of uploaded image filenames to the images field.
-    req.body.images = req.files.images.map((file) => file.filename);
+    // Check if images are uploaded and assign the array of uploaded image filenames to the images field.
+    if (req.files.images && Array.isArray(req.files.images) && req.files.images.length > 0) {
+        req.body.images = req.files.images.map((file) => file.filename);
+    } else {
+        req.body.images = []; // Assign an empty array if no images are uploaded
+    }
 
     // Generate a slug based on the product's title.
     req.body.slug = slugify(req.body.title);
@@ -34,6 +39,9 @@ export const addProduct = catchError(async (req, res, next) => {
     // Send a success response with the newly created product.
     res.status(201).json({ message: 'Added product', product });
 });
+
+
+
 
 /**
  * Retrieve all products from the database, applying filters, sorting, pagination, and search as needed.
@@ -72,8 +80,8 @@ export const getProductById = catchError(async (req, res, next) => {
  */
 export const updateProduct = catchError(async (req, res, next) => {
     // Generate a new slug if the product name is updated.
-    if (req.body.name) {
-        req.body.slug = slugify(req.body.name);
+    if (req.body.title) {
+        req.body.slug = slugify(req.body.title);
     }
 
     // Find the existing product in the database by ID.

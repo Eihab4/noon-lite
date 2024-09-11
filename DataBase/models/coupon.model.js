@@ -22,6 +22,10 @@ const couponSchema = new Schema({
     endDate: {
         type: Date,
         required: true
+    },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }
 })
 

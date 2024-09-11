@@ -8,6 +8,6 @@ export const wishlistRouter = Router()
 
 
 wishlistRouter.patch('/', protectedRoutes, allowedTo('user'), validate(addToWishlistValidation),addToWishlist)
-wishlistRouter.delete('/', protectedRoutes, allowedTo('user', 'admin'), validate(removeFromWishlistValidation),removeFromWishlist)
+wishlistRouter.put('/', protectedRoutes, allowedTo('user', 'admin'), validate(removeFromWishlistValidation),removeFromWishlist)
 wishlistRouter.get('/', protectedRoutes, allowedTo('user', 'admin'), getWishlist)
 

@@ -6,10 +6,10 @@ import { addCartValidation, applyCouponValidation, removeFromCartValidation, upd
 
 export const cartRouter = Router();
 
-
-cartRouter.post('/', protectedRoutes, allowedTo('user'), validate(addCartValidation),addToCart)
-cartRouter.put('/:id', protectedRoutes, allowedTo('user'), validate(updateCartValidation),updateQuantity)
-cartRouter.delete('/:id', protectedRoutes, allowedTo('user'), validate(removeFromCartValidation),removeFromCart)
-cartRouter.get('/', protectedRoutes, allowedTo('user'), getCartItems)
-cartRouter.delete('/', protectedRoutes, allowedTo('user'), clearCart)
-cartRouter.post('/apply-coupon', protectedRoutes, allowedTo('user'), validate(applyCouponValidation),applyCoupon)
+cartRouter.use(protectedRoutes,allowedTo('user'))
+cartRouter.post('/',  validate(addCartValidation),addToCart)
+cartRouter.put('/:id',  validate(updateCartValidation),updateQuantity)
+cartRouter.patch('/:id',  validate(removeFromCartValidation),removeFromCart)
+cartRouter.get('/',  getCartItems)
+cartRouter.delete('/',  clearCart)
+cartRouter.post('/apply-coupon',  validate(applyCouponValidation),applyCoupon)

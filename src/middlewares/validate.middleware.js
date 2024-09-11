@@ -3,7 +3,6 @@ import { AppError } from "../utils/AppError.utils.js";
 export const validate = (schema) => {
     return (req, res, next) => {
         let filter = {};
-        console.log(req.files)
         // For single file upload
         if (req.file) {
             filter = { 
@@ -28,10 +27,8 @@ export const validate = (schema) => {
                 ...req.params 
             };
         }
-
         // Validate the data against the schema
         const { error } = schema.validate(filter, { abortEarly: false });
-        console.log(error)
         if (!error) {
             next(); // Proceed to the next middleware
         } else {
