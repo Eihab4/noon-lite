@@ -11,6 +11,7 @@ Welcome to the E-Commerce Application! This project is designed to provide a sea
 - [API Endpoints](#api-endpoints)
 - [Contributing](#contributing)
 - [Database ERD](#database-erd)
+- [Usage Examples](#usage-examples)
 
 ## Features
 
@@ -81,7 +82,9 @@ Here are some of the key API endpoints available in this application:
 - **Add Review**: `POST /api/products/:id/reviews`
 - **Apply Coupon**: `POST /api/coupons/apply`
 
-Refer to the API documentation for detailed usage and examples.
+## Usage Examples
+
+Explore and test our API endpoints using [Postman](https://documenter.getpostman.com/view/34440263/2sAXqmBkSs). Detailed usage examples are provided for each API endpoint.
 
 ## Contributing
 
@@ -92,6 +95,9 @@ We welcome contributions to enhance the E-Commerce Application! Please follow th
 3. Commit your changes: `git commit -m 'Add some feature'`
 4. Push to the branch: `git push origin feature/YourFeature`
 5. Open a pull request.
+
+
+   
 
 ---
 
