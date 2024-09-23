@@ -45,7 +45,7 @@ To get started with the E-Commerce Application, follow the instructions below to
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/e-commerce.git
+   git clone https://github.com/Eihab4/e-commerce.git
    ```
    
 2. Navigate to the project directory:
